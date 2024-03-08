@@ -15,9 +15,16 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import java.io.IOException;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 
-public class SnakeGame extends SurfaceView implements Runnable{
 
+class SnakeGame extends SurfaceView implements Runnable{
+
+
+    private Typeface gameFont;
+    private Bitmap mBackgroundBitmap;
     // Objects for the game loop/thread
     private Thread mThread = null;
     // Control pausing between updates
@@ -91,6 +98,14 @@ public class SnakeGame extends SurfaceView implements Runnable{
         // Initialize the drawing objects
         mSurfaceHolder = getHolder();
         mPaint = new Paint();
+
+        // Load the background image
+        mBackgroundBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.game_background);
+        mBackgroundBitmap = Bitmap.createScaledBitmap(mBackgroundBitmap, size.x, size.y, false);
+
+        // Load the "Press Start 2P" font from the assets/fonts directory
+        gameFont = Typeface.createFromAsset(context.getAssets(), "fonts/press_start_2p.ttf");
+
 
         // Call the constructors of our two game objects
         mApple = new Apple(context,
@@ -200,15 +215,28 @@ public class SnakeGame extends SurfaceView implements Runnable{
         if (mSurfaceHolder.getSurface().isValid()) {
             mCanvas = mSurfaceHolder.lockCanvas();
 
-            // Fill the screen with a color
-            mCanvas.drawColor(Color.argb(255, 26, 128, 182));
+            // Draw the background first
+            mCanvas.drawBitmap(mBackgroundBitmap, 0, 0, null);
+
+            mPaint.setTextSize(40); //
+            mPaint.setColor(Color.WHITE);
+            mPaint.setTypeface(gameFont);
+
+            String names = "Jacob & Adiba";
+            float xPosition = 20; // 20 pixels from the left edge of the screen
+            float yPosition = 80; // 80 pixels from the top edge of the screen
+
+            mCanvas.drawText(names, xPosition, yPosition, mPaint);
+
 
             // Set the size and color of the mPaint for the text
             mPaint.setColor(Color.argb(255, 255, 255, 255));
-            mPaint.setTextSize(120);
+            mPaint.setTextSize(100);
+            mPaint.setTypeface(gameFont); // Set the typeface for the score
+
 
             // Draw the score
-            mCanvas.drawText("" + mScore, 20, 120, mPaint);
+            mCanvas.drawText("" + mScore, 20, 200, mPaint);
 
             // Draw the apple and the snake
             mApple.draw(mCanvas, mPaint);
@@ -219,14 +247,15 @@ public class SnakeGame extends SurfaceView implements Runnable{
 
                 // Set the size and color of the mPaint for the text
                 mPaint.setColor(Color.argb(255, 255, 255, 255));
-                mPaint.setTextSize(250);
+                mPaint.setTextSize(180);
+                mPaint.setTypeface(gameFont); // Ensure the typeface is set for this text as well
 
                 // Draw the message
                 // We will give this an international upgrade soon
                 //mCanvas.drawText("Tap To Play!", 200, 700, mPaint);
                 mCanvas.drawText(getResources().
                                 getString(R.string.tap_to_play),
-                        200, 700, mPaint);
+                        500, 750, mPaint);
             }
 
 
