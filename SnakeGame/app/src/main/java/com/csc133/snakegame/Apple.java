@@ -8,7 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import java.util.Random;
 
-class Apple {
+class Apple implements DrawableMovable {
 
     // The location of the apple on the grid
     // Not in pixels
@@ -31,6 +31,8 @@ class Apple {
         mSize = s;
         // Hide the apple off-screen until the game starts
         location.x = -10;
+        location.y = -10;
+
 
         // Load the image to the bitmap
         mBitmapApple = BitmapFactory.decodeResource(context.getResources(), R.drawable.apple);
@@ -40,7 +42,7 @@ class Apple {
     }
 
     // This is called every time an apple is eaten
-    void spawn(){
+    public void spawn(){
         // Choose two random values and place the apple
         Random random = new Random();
         location.x = random.nextInt(mSpawnRange.x) + 1;
@@ -49,15 +51,28 @@ class Apple {
 
     // Let SnakeGame know where the apple is
     // SnakeGame can share this with the snake
-    Point getLocation(){
+    public Point getLocation(){
         return location;
     }
 
     // Draw the apple
-    void draw(Canvas canvas, Paint paint){
+    public void draw(Canvas canvas, Paint paint){
         canvas.drawBitmap(mBitmapApple,
                 location.x * mSize, location.y * mSize, paint);
 
+    }
+
+    // Since the Apple doesn't move by itself, this method can be left empty
+    @Override
+    public void move() {
+        // Apple doesn't move so this can remain empty
+    }
+
+    // Resets the apple's position off-screen
+    @Override
+    public void reset() {
+        location.x = -10; // Move off-screen
+        location.y = -10; // Move off-screen
     }
 
 }

@@ -11,7 +11,7 @@ import android.view.MotionEvent;
 
 import java.util.ArrayList;
 
-class Snake {
+class Snake implements DrawableMovable{
 
     // The location in the grid of all the segments
     private ArrayList<Point> segmentLocations;
@@ -113,6 +113,14 @@ class Snake {
         halfWayPoint = mr.x * ss / 2;
     }
 
+    @Override
+    public void reset() {
+        // Resetting the snake's state for a new game
+        segmentLocations.clear(); // Clear old segments
+        segmentLocations.add(new Point(mMoveRange.x / 2, mMoveRange.y / 2)); // Start in middle
+        heading = Heading.RIGHT; // Default direction
+    }
+
     // Get the snake ready for a new game
     void reset(int w, int h) {
 
@@ -127,7 +135,7 @@ class Snake {
     }
 
 
-    void move() {
+    public void move() {
         // Move the body
         // Start at the back and move it
         // to the position of the segment in front of it
@@ -205,11 +213,10 @@ class Snake {
         return false;
     }
 
-    void draw(Canvas canvas, Paint paint) {
-
-        // Don't run this code if ArrayList has nothing in it
+    public void draw(Canvas canvas, Paint paint) {
+        // Check if there are any segments to draw
         if (!segmentLocations.isEmpty()) {
-            // All the code from this method goes here
+            // Existing drawing code...
             // Draw the head
             switch (heading) {
                 case RIGHT:
@@ -256,6 +263,12 @@ class Snake {
         }
     }
 
+
+    @Override
+    public Point getLocation() {
+        // Return the location of the snake's head
+        return segmentLocations.get(0);
+    }
 
     // Handle changing direction
     void switchHeading(MotionEvent motionEvent) {

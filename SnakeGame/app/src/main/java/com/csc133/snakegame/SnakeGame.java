@@ -20,7 +20,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 
 
-class SnakeGame extends SurfaceView implements Runnable{
+class SnakeGame extends SurfaceView implements Runnable, GameControls{
 
 
     private Typeface gameFont;
@@ -51,9 +51,15 @@ class SnakeGame extends SurfaceView implements Runnable{
     private Paint mPaint;
 
     // A snake ssss
-    private Snake mSnake;
-    // And an apple
-    private Apple mApple;
+//    private Snake mSnake;
+////    // And an apple
+//    private Apple mApple;
+
+
+    // DrawableMovable interfaces for the snake and apple
+    private DrawableMovable mSnake;
+    private DrawableMovable mApple;
+
 
 
     // This is the constructor method that gets called
@@ -123,17 +129,17 @@ class SnakeGame extends SurfaceView implements Runnable{
 
     // Called to start a new game
     public void newGame() {
+        // Reset the game objects
+        mSnake.reset();
+        mApple.reset();
 
-        // reset the snake
-        mSnake.reset(NUM_BLOCKS_WIDE, mNumBlocksHigh);
+        // Prepare the game objects for a new game
+        ((Apple)mApple).spawn(); // Note: spawn is specific to Apple, this might be considered to change based on design
 
-        // Get the apple ready for dinner
-        mApple.spawn();
-
-        // Reset the mScore
+        // Reset the score
         mScore = 0;
 
-        // Setup mNextFrameTime so an update can triggered
+        // Setup mNextFrameTime so an update can be triggered
         mNextFrameTime = System.currentTimeMillis();
     }
 
@@ -151,6 +157,17 @@ class SnakeGame extends SurfaceView implements Runnable{
 
             draw();
         }
+    }
+
+    // Implement the GameControls interface methods
+    @Override
+    public void pauseGame() {
+        mPaused = true;
+    }
+
+    @Override
+    public void resumeGame() {
+        mPaused = false;
     }
 
 
@@ -182,30 +199,20 @@ class SnakeGame extends SurfaceView implements Runnable{
     // Update all the game objects
     public void update() {
 
-        // Move the snake
-        mSnake.move();
+        mSnake.move(); // Move the snake
 
-        // Did the head of the snake eat the apple?
-        if(mSnake.checkDinner(mApple.getLocation())){
-            // This reminds me of Edge of Tomorrow.
-            // One day the apple will be ready!
-            mApple.spawn();
-
-            // Add to  mScore
-            mScore = mScore + 1;
-
-            // Play a sound
-            mSP.play(mEat_ID, 1, 1, 0, 0, 1);
+        // Check if the snake ate the apple
+        if (((Snake)mSnake).checkDinner(mApple.getLocation())) {
+            ((Apple)mApple).spawn(); // Respawn the apple
+            mScore += 1; // Increase the score
+            mSP.play(mEat_ID, 1, 1, 0, 0, 1); // Play eating sound
         }
 
-        // Did the snake die?
-        if (mSnake.detectDeath()) {
-            // Pause the game ready to start again
-            mSP.play(mCrashID, 1, 1, 0, 0, 1);
-
-            mPaused =true;
+        // Check if the snake has died
+        if (((Snake)mSnake).detectDeath()) {
+            mSP.play(mCrashID, 1, 1, 0, 0, 1); // Play death sound
+            mPaused = true; // Pause the game
         }
-
     }
 
 
@@ -231,7 +238,7 @@ class SnakeGame extends SurfaceView implements Runnable{
 
             // Set the size and color of the mPaint for the text
             mPaint.setColor(Color.argb(255, 255, 255, 255));
-            mPaint.setTextSize(100);
+            mPaint.setTextSize(120);
             mPaint.setTypeface(gameFont); // Set the typeface for the score
 
 
@@ -247,7 +254,7 @@ class SnakeGame extends SurfaceView implements Runnable{
 
                 // Set the size and color of the mPaint for the text
                 mPaint.setColor(Color.argb(255, 255, 255, 255));
-                mPaint.setTextSize(180);
+                mPaint.setTextSize(120);
                 mPaint.setTypeface(gameFont); // Ensure the typeface is set for this text as well
 
                 // Draw the message
@@ -255,7 +262,7 @@ class SnakeGame extends SurfaceView implements Runnable{
                 //mCanvas.drawText("Tap To Play!", 200, 700, mPaint);
                 mCanvas.drawText(getResources().
                                 getString(R.string.tap_to_play),
-                        500, 750, mPaint);
+                        250, 550, mPaint);
             }
 
 
@@ -264,20 +271,22 @@ class SnakeGame extends SurfaceView implements Runnable{
         }
     }
 
-    @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_UP:
-                if (mPaused) {
+                if (mPaused && !mPlaying) { // Only start a new game if it's paused and not already playing
                     mPaused = false;
+                    mPlaying = true; // Make sure the game is set to play mode
                     newGame();
 
                     // Don't want to process snake direction for this tap
                     return true;
                 }
 
-                // Let the Snake class handle the input
-                mSnake.switchHeading(motionEvent);
+                // If the game is playing, handle snake direction
+                if (mPlaying && !mPaused) {
+                    ((Snake)mSnake).switchHeading(motionEvent);
+                }
                 break;
 
             default:
