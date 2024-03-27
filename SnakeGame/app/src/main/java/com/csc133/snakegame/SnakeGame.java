@@ -147,6 +147,8 @@ class SnakeGame extends SurfaceView implements Runnable, GameControls{
     // Handles the game loop
     @Override
     public void run() {
+        // Ensure newGame is called before game loop starts
+        newGame();
         while (mPlaying) {
             if(!mPaused) {
                 // Update 10 times a second
@@ -198,20 +200,18 @@ class SnakeGame extends SurfaceView implements Runnable, GameControls{
 
     // Update all the game objects
     public void update() {
-
         mSnake.move(); // Move the snake
 
-        // Check if the snake ate the apple
         if (((Snake)mSnake).checkDinner(mApple.getLocation())) {
             ((Apple)mApple).spawn(); // Respawn the apple
             mScore += 1; // Increase the score
             mSP.play(mEat_ID, 1, 1, 0, 0, 1); // Play eating sound
         }
 
-        // Check if the snake has died
         if (((Snake)mSnake).detectDeath()) {
             mSP.play(mCrashID, 1, 1, 0, 0, 1); // Play death sound
-            mPaused = true; // Pause the game
+            // Instead of just pausing, let's start a new game automatically
+            newGame();
         }
     }
 
@@ -271,27 +271,26 @@ class SnakeGame extends SurfaceView implements Runnable, GameControls{
         }
     }
 
+    @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_UP:
-                if (mPaused && !mPlaying) { // Only start a new game if it's paused and not already playing
+                if (mPaused || !mPlaying) { // Start a new game or resume if paused
+                    if (!mPlaying) {
+                        mPlaying = true;
+                        mThread = new Thread(this);
+                        mThread.start();
+                    }
                     mPaused = false;
-                    mPlaying = true; // Make sure the game is set to play mode
                     newGame();
-
-                    // Don't want to process snake direction for this tap
                     return true;
-                }
-
-                // If the game is playing, handle snake direction
-                if (mPlaying && !mPaused) {
+                } else {
+                    // If the game is playing, handle snake direction
                     ((Snake)mSnake).switchHeading(motionEvent);
                 }
                 break;
-
             default:
                 break;
-
         }
         return true;
     }
@@ -310,6 +309,7 @@ class SnakeGame extends SurfaceView implements Runnable, GameControls{
 
     // Start the thread
     public void resume() {
+        newGame(); // Set up the initial game state
         mPlaying = true;
         mThread = new Thread(this);
         mThread.start();

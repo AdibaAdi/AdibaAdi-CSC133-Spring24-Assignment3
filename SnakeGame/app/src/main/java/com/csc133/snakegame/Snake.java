@@ -136,6 +136,10 @@ class Snake implements DrawableMovable{
 
 
     public void move() {
+        if (segmentLocations.isEmpty()) {
+            // Nothing to move if there are no segments
+            return;
+        }
         // Move the body
         // Start at the back and move it
         // to the position of the segment in front of it
@@ -173,6 +177,10 @@ class Snake implements DrawableMovable{
     }
 
     boolean detectDeath() {
+        if (segmentLocations.isEmpty()) {
+            // Can't die if there are no segments
+            return false;
+        }
         // Has the snake died?
         boolean dead = false;
 
@@ -198,6 +206,10 @@ class Snake implements DrawableMovable{
     }
 
     boolean checkDinner(Point l) {
+        if (segmentLocations.isEmpty()) {
+            // No head to check for dinner
+            return false;
+        }
         //if (snakeXs[0] == l.x && snakeYs[0] == l.y) {
         if (segmentLocations.get(0).x == l.x &&
                 segmentLocations.get(0).y == l.y) {
