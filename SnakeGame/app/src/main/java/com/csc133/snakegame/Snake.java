@@ -174,6 +174,7 @@ class Snake implements DrawableMovable{
                 break;
         }
 
+
     }
 
     boolean detectDeath() {
