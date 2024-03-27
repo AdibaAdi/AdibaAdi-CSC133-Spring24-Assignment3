@@ -32,6 +32,8 @@ class SnakeGame extends SurfaceView implements Runnable, GameControls{
     // Is the game currently playing and or paused?
     private volatile boolean mPlaying = false;
     private volatile boolean mPaused = true;
+    private PauseButtonHandler pauseButtonHandler;
+
 
     // for playing sound effects
     private SoundPool mSP;
@@ -125,7 +127,9 @@ class SnakeGame extends SurfaceView implements Runnable, GameControls{
                 blockSize);
 
     }
-
+    public void setPauseButtonHandler(PauseButtonHandler handler) {
+        this.pauseButtonHandler = handler;
+    }
 
     // Called to start a new game
     public void newGame() {
@@ -134,14 +138,20 @@ class SnakeGame extends SurfaceView implements Runnable, GameControls{
         mApple.reset();
 
         // Prepare the game objects for a new game
-        ((Apple)mApple).spawn(); // Note: spawn is specific to Apple, this might be considered to change based on design
+        ((Apple)mApple).spawn(); // Note: spawn is specific to Apple
 
         // Reset the score
         mScore = 0;
 
         // Setup mNextFrameTime so an update can be triggered
         mNextFrameTime = System.currentTimeMillis();
+
+        // Reset the pause button if the handler is set
+        if (pauseButtonHandler != null) {
+            pauseButtonHandler.resetPauseButton();
+        }
     }
+
 
 
     // Handles the game loop
@@ -210,8 +220,10 @@ class SnakeGame extends SurfaceView implements Runnable, GameControls{
 
         if (((Snake)mSnake).detectDeath()) {
             mSP.play(mCrashID, 1, 1, 0, 0, 1); // Play death sound
-            // Instead of just pausing, let's start a new game automatically
             newGame();
+            if (pauseButtonHandler != null) {
+                pauseButtonHandler.resetPauseButton();
+            }
         }
     }
 
@@ -314,4 +326,7 @@ class SnakeGame extends SurfaceView implements Runnable, GameControls{
         mThread = new Thread(this);
         mThread.start();
     }
+
+    // Called to start a new game
+
 }

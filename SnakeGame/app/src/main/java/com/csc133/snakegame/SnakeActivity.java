@@ -14,6 +14,8 @@ public class SnakeActivity extends Activity {
     SnakeGame mSnakeGame;
     PauseButtonHandler pauseButtonHandler;
 
+
+
     // Set the game up
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,8 @@ public class SnakeActivity extends Activity {
 
         // Initialize the pause button handler
         pauseButtonHandler = new PauseButtonHandler(this, mSnakeGame);
+
+        mSnakeGame.setPauseButtonHandler(pauseButtonHandler);
 
         // Set layout parameters for the pause button to place it at the bottom middle of the screen
         FrameLayout.LayoutParams buttonParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);

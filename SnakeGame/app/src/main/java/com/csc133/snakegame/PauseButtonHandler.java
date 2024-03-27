@@ -34,4 +34,9 @@ public class PauseButtonHandler implements View.OnClickListener {
             isPaused = true;
         }
     }
+    public void resetPauseButton() {
+        pauseButton.setText("Pause");
+        isPaused = false;
+    }
+
 }
