@@ -244,46 +244,77 @@ class SnakeGame extends SurfaceView implements Runnable, GameControls{
 
 
     // Do all the drawing
+    // Original lengthy draw() method
     public void draw() {
-        // Get a lock on the mCanvas
         if (mSurfaceHolder.getSurface().isValid()) {
             mCanvas = mSurfaceHolder.lockCanvas();
+            if (mCanvas != null) {
+                // Draw background
+                drawBackground();
 
-            // Draw the background first
-            mCanvas.drawBitmap(mBackgroundBitmap, 0, 0, null);
+                // Draw names and score
+                drawText();
 
-            // Draw the names "Jacob & Adiba" in the top right corner
-            mPaint.setTextSize(40); // Smaller size for better screen fit
-            mPaint.setColor(Color.WHITE);
-            mPaint.setTypeface(gameFont);
+                // Draw game objects
+                drawGameObjects();
 
-            // Calculate the position for "Jacob & Adiba" to appear in the top right corner
-            String names = "Jacob & Adiba";
-            float textWidth = mPaint.measureText(names);
-            float xPositionNames = mCanvas.getWidth() - textWidth - 20; // 20 pixels from the right edge
-            float yPositionNames = 60; // 60 pixels from the top
-            mCanvas.drawText(names, xPositionNames, yPositionNames, mPaint);
+                // If game is paused, draw "Tap to Play" message
+                if (mPaused) {
+                    drawTapToPlay();
+                }
 
-            // Draw the score in the top left corner
-            mPaint.setTextSize(SCORE_TEXT_SIZE);
-            mCanvas.drawText("Score: " + mScore, SCORE_MARGIN_LEFT, SCORE_MARGIN_TOP, mPaint);
-
-            // Draw the apple and the snake
-            mApple.draw(mCanvas, mPaint);
-            mSnake.draw(mCanvas, mPaint);
-
-            // If the game is paused, draw the "Tap to Play" message centered
-            if (mPaused) {
-                mPaint.setTextSize(90); // Larger text size for "Tap to Play"
-                float tapToPlayWidth = mPaint.measureText("Tap to Play");
-                float xPositionTapToPlay = (mCanvas.getWidth() - tapToPlayWidth) / 2;
-                float yPositionTapToPlay = mCanvas.getHeight() / 2;
-                mCanvas.drawText("Tap to Play", xPositionTapToPlay, yPositionTapToPlay, mPaint);
+                // Unlock canvas and post
+                mSurfaceHolder.unlockCanvasAndPost(mCanvas);
             }
-
-            // Unlock the mCanvas and reveal the graphics for this frame
-            mSurfaceHolder.unlockCanvasAndPost(mCanvas);
         }
+    }
+
+    // Refactored drawBackground() method
+    private void drawBackground() {
+        mCanvas.drawBitmap(mBackgroundBitmap, 0, 0, null);
+    }
+
+    // Refactored drawText() method
+    private void drawText() {
+        // Draw names "Jacob & Adiba" in top right corner
+        drawNames();
+
+        // Draw score in top left corner
+        drawScore();
+    }
+
+    // Refactored drawNames() method
+    private void drawNames() {
+        mPaint.setTextSize(40);
+        mPaint.setColor(Color.WHITE);
+        mPaint.setTypeface(gameFont);
+        String names = "Jacob & Adiba";
+        float textWidth = mPaint.measureText(names);
+        float xPositionNames = mCanvas.getWidth() - textWidth - 20; // 20 pixels from right edge
+        float yPositionNames = 60; // 60 pixels from top
+        mCanvas.drawText(names, xPositionNames, yPositionNames, mPaint);
+    }
+
+    // Refactored drawScore() method
+    private void drawScore() {
+        mPaint.setTextSize(60);
+        mCanvas.drawText("Score: " + mScore, 20, 120, mPaint);
+    }
+
+    // Refactored drawGameObjects() method
+    private void drawGameObjects() {
+        // Draw apple and snake
+        mApple.draw(mCanvas, mPaint);
+        mSnake.draw(mCanvas, mPaint);
+    }
+
+    // Refactored drawTapToPlay() method
+    private void drawTapToPlay() {
+        mPaint.setTextSize(90);
+        float tapToPlayWidth = mPaint.measureText("Tap to Play");
+        float xPositionTapToPlay = (mCanvas.getWidth() - tapToPlayWidth) / 2;
+        float yPositionTapToPlay = mCanvas.getHeight() / 2;
+        mCanvas.drawText("Tap to Play", xPositionTapToPlay, yPositionTapToPlay, mPaint);
     }
 
 
