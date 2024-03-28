@@ -129,7 +129,7 @@ class SnakeGame extends SurfaceView implements Runnable, GameControls{
         mApple = new Apple(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
         mSnake = new Snake(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
     }
-
+// -
 
     public void setPauseButtonHandler(PauseButtonHandler handler) {
         this.pauseButtonHandler = handler;
