@@ -75,13 +75,16 @@ class SnakeGame extends SurfaceView implements Runnable, GameControls{
     public SnakeGame(Context context, Point size) {
         super(context);
 
+        // Set the activity context
         if (context instanceof Activity) {
             mActivity = (Activity) context;
         }
 
+        // Calculate the block size and number of blocks high based on the screen size
         int blockSize = size.x / NUM_BLOCKS_WIDE;
         mNumBlocksHigh = size.y / blockSize;
 
+        // Initialize SoundPool with appropriate settings based on Android version
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             AudioAttributes audioAttributes = new AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_MEDIA)
@@ -96,6 +99,7 @@ class SnakeGame extends SurfaceView implements Runnable, GameControls{
             mSP = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
         }
 
+        // Load sound effects from assets
         try {
             AssetManager assetManager = context.getAssets();
             AssetFileDescriptor descriptor;
@@ -110,14 +114,18 @@ class SnakeGame extends SurfaceView implements Runnable, GameControls{
             // Error handling
         }
 
+        // Initialize SurfaceHolder and Paint objects
         mSurfaceHolder = getHolder();
         mPaint = new Paint();
 
+        // Load background bitmap and resize it to fit the screen
         mBackgroundBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.game_background);
         mBackgroundBitmap = Bitmap.createScaledBitmap(mBackgroundBitmap, size.x, size.y, false);
 
+        // Load custom font
         gameFont = Typeface.createFromAsset(context.getAssets(), "fonts/press_start_2p.ttf");
 
+        // Initialize Apple and Snake objects
         mApple = new Apple(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
         mSnake = new Snake(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
     }
