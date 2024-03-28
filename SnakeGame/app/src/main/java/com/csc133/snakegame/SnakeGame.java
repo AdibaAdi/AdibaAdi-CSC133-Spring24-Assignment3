@@ -243,7 +243,6 @@ class SnakeGame extends SurfaceView implements Runnable, GameControls{
     }
 
 
-
     // Do all the drawing
     public void draw() {
         // Get a lock on the mCanvas
