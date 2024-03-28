@@ -24,7 +24,9 @@ import android.app.Activity;
 class SnakeGame extends SurfaceView implements Runnable, GameControls{
 
 
-
+    private static final int SCORE_TEXT_SIZE = 40;
+    private static final int SCORE_MARGIN_LEFT = 20;
+    private static final int SCORE_MARGIN_TOP = 120;
     private Activity mActivity;
 
     private Typeface gameFont;
@@ -256,8 +258,8 @@ class SnakeGame extends SurfaceView implements Runnable, GameControls{
             mCanvas.drawText(names, xPositionNames, yPositionNames, mPaint);
 
             // Draw the score in the top left corner
-            mPaint.setTextSize(60); // Adjust text size for the score
-            mCanvas.drawText("Score: " + mScore, 20, 120, mPaint); // Adjust y-position to avoid overlap with names
+            mPaint.setTextSize(SCORE_TEXT_SIZE);
+            mCanvas.drawText("Score: " + mScore, SCORE_MARGIN_LEFT, SCORE_MARGIN_TOP, mPaint);
 
             // Draw the apple and the snake
             mApple.draw(mCanvas, mPaint);
